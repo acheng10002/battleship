@@ -14,9 +14,9 @@ class Ship {
     return ++this.timesHit;
   }
 
-  // isSUnk calculates whether a ship is considered sunk based on its length and the number of hits it has received
+  // isSunk calculates whether a ship is considered sunk based on its length and the number of hits it has received
   isSunk() {
-    if (this.length === this.timesHit) {
+    if (this.timesHit === this.length) {
       this.sunk = true;
     }
     return this.sunk;
@@ -55,17 +55,16 @@ class Gameboard {
     return grid;
   }
   // checks if x- and y- coordinates fall between 0 and 10
-  areValidCoordinates(x, y) {
+  areValidCoordinates({ x, y }) {
     return x >= 0 && x < this.size && y >= 0 && y < this.size;
   }
 
   // place ships at specific coordinates by calling the ship class
-  placeShip(name, length, { startX, startY }, { endX, endY }) {
+  placeShip(name, length, start, end) {
+    const { x: startX, y: startY } = start;
+    const { x: endX, y: endY } = end;
     // checks if the start and end pair of coordinates are valid
-    if (
-      !this.areValidCoordinates(startX, startY) ||
-      !this.areValidCoordinates(endX, endY)
-    ) {
+    if (!this.areValidCoordinates(start) || !this.areValidCoordinates(end)) {
       // if not, throws an error with a message
       throw new Error("Invalid coordinates");
     }
@@ -97,9 +96,12 @@ class Gameboard {
       (in this case, startY === endY since the ship is horizontally placed */
       for (let x = startX; x <= endX; x++) {
         // if any of the cells are already occupied by a Ship object
-        if (this.grid[x][startY].ship !== null) {
+        if (
+          !this.areValidCoordinates({ x, y: startY }) ||
+          this.grid[x][startY].ship !== null
+        ) {
           // throw an error with a message
-          throw new Error("Position already occupied");
+          throw new Error("Position already occupied or out of bounds");
         }
       }
       // if the ship is placed vertically
@@ -108,9 +110,12 @@ class Gameboard {
       (in this case, startX === endX since the ship is vertically placed */
       for (let y = startY; y <= endY; y++) {
         // if any of the cells are already occupied by a Ship object
-        if (this.grid[startX][y].ship !== null) {
+        if (
+          !this.areValidCoordinates({ x: startX, y }) ||
+          this.grid[startX][y].ship !== null
+        ) {
           // throw an error with a message
-          throw new Error("Possible already occupied");
+          throw new Error("Possible already occupied or out of bounds");
         }
       }
     }
@@ -142,9 +147,9 @@ class Gameboard {
   }
 
   // takes a pair of coodinates and signals whether or not a ship is hit
-  receiveAttack(x, y) {
+  receiveAttack({ x, y }) {
     // checks if the pair of coordinates is valid
-    if (!this.areValidCoordinates(x, y)) {
+    if (!this.areValidCoordinates({ x, y })) {
       // if not, throw an error with a message
       throw new Error("Invalid coordinates");
     }
@@ -155,15 +160,37 @@ class Gameboard {
       // if it does, sends the hit function to the correct ship
       target.hit();
       // determines if the ship hit is now sunk
-      return target.isSunk() ? "sunk" : "hit";
+      return target.isSunk();
     } else {
       // keeps track of misses so they be displayed properly
       this.misses.push({ x, y });
+      // return false indicating no ship was sunk
+      return false;
     }
+  }
+
+  // reports whether or not all of the ships have been sunk
+  areAllShipsSunk() {
+    return this.ships.every((ship) => ship.isSunk());
+  }
+}
+
+class Player {
+  constructor(type) {
+    // there will be two types of players, real and computer
+    this.type = type;
+    // each player object should contain its own gameboard
+    this.gameboard = this.createGameboard();
+  }
+
+  createGameboard() {
+    const gameboard = new Gameboard();
+    return gameboard;
   }
 }
 
 module.exports = {
   Ship,
   Gameboard,
+  Player,
 };

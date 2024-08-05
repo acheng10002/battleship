@@ -1,9 +1,14 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+
 body {
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   height: 100vh;
-  margin: 0;
   font-family: Arial, Helvetica, sans-serif;
   background-color: #f0f0f0;
 }
@@ -11,6 +16,7 @@ body {
 .container {
   display: flex;
   gap: 50px;
+  margin-bottom: 80px !important;
 }
 
 .player {
@@ -29,8 +35,78 @@ body {
   height: 40px;
   background-color: lightgray;
   border: 1px solid #ccc;
+  /* allows pseudo-elements of cell-hit to be positioned relative to the cell */
+  position: relative;
 }
 
 .ship-cell {
   background-color: lightblue;
+}
+
+.hide-ship-cell .ship-cell {
+  background-color: lightgray !important;
+}
+
+.cell-hit {
+  /* Ensure the background remains light gray */
+  background-color: lightgray; 
+}
+
+/* ::before and ::after used to create the two lines of the red X */
+.cell-hit::before,
+.cell-hit::after {
+  /* necessary to generate the pseudo-element */
+  content: '';
+  /* ensures that the pseudo-elements are positioned absolutely within the grid-cell */
+  position: absolute;
+  width: 2px;
+  height: 100%;
+  background-color: red;
+}
+
+.cell-hit::before {
+  /* rotate the pseudo-element 45deg to the right */
+  transform: rotate(45deg);
+  /* positions the pseudo-element at the top center of the cell */
+  top: 0;
+  left: 50%;
+  /* ensures the rotation occurs from the center of the pseudo-element */
+  transform-origin: center;
+}
+
+.cell-hit::after {
+   /* rotate the pseudo-element 45deg to the left */
+  transform: rotate(-45deg);
+  /* positions the pseudo-element at the top center of the cell */
+  top: 0;
+  left: 50%;
+  /* ensures the rotation occurs from the center of the pseudo-element */
+  transform-origin: center;
+}
+
+.cell-miss {
+  /* Ensure the background remains light gray */
+  background-color: lightgray; 
+}
+
+/* just ::before needed to create single continuous circle shape */
+.cell-miss::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  /* Diameter of the circle */
+  width: 20px; 
+  /* Diameter of the circle */
+  height: 20px; 
+  background-color: lightgray;
+  border: 2px solid blue;
+  /* Makes the pseudo-element a circle */
+  border-radius: 50%; 
+  /* Centers the circle in the cell */
+  transform: translate(-50%, -50%); 
+}
+
+h1, h2 {
+  margin-bottom: 15px;
 }

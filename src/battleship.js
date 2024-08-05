@@ -47,7 +47,7 @@ class Gameboard {
         each cell is an object with x property that holds the value of the x coordinate,
         y property that holds the value of the y coordinate, and ship property that is currently set to null
         but later can be assigned to a Ship object */
-        row.push({ x, y, ship: null });
+        row.push({ x, y, ship: null, cellAttacked: false });
       }
       // adds the current row to the grid, after all of the current row's cells are added
       grid.push(row);
@@ -156,16 +156,16 @@ class Gameboard {
 
     // determines if the attack hit a ship
     const target = this.grid[x][y].ship;
+    // marks the cell as attacked
+    this.grid[x][y].cellAttacked = true;
     if (target) {
       // if it does, sends the hit function to the correct ship
       target.hit();
-      // determines if the ship hit is now sunk
-      return target.isSunk();
+      return 'hit';
     } else {
-      // keeps track of misses so they be displayed properly
+      // keeps track of misses so they can be displayed properly
       this.misses.push({ x, y });
-      // return false indicating no ship was sunk
-      return false;
+      return 'miss';
     }
   }
 
@@ -182,15 +182,24 @@ class Player {
     // each player object should contain its own gameboard
     this.gameboard = this.createGameboard();
   }
-
+  // each player contains their own gameboard
   createGameboard() {
     const gameboard = new Gameboard();
     return gameboard;
   }
+
+  // if the player's type property is computer, this method will get used
+  makeRandomMove(gameboard) {
+    let x, y;
+    // randomly generates x and y coordinates at least once
+    do {
+      x = Math.floor(Math.random() * gameboard.size);
+      y = Math.floor(Math.random() * gameboard.size);
+    // keeps looping if the cell has already been attacked
+    } while (gameboard.grid[x][y].cellAttacked);
+    // when the cell isn't one that's already been attacked
+    return { x, y };
+  }
 }
 
-module.exports = {
-  Ship,
-  Gameboard,
-  Player,
-};
+export { Player };

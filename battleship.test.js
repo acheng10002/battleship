@@ -1,18 +1,12 @@
-const { Gameboard, Player } = require("../src/battleship");
-const Ship = require("../src/Ship");
+import { Gameboard, Player } from "./src/battleship";
 
 describe("Ship class real implementation", () => {
   let ship;
 
-  beforeAll(() => {
-    jest.dontMock("../src/Ship");
-    const { Ship: RealShip } = require("../src/battleship");
-    ship = new RealShip("testShip", 5);
-  });
-
   beforeEach(() => {
-    jest.clearAllMocks();
-    ship = new Ship("testShip", 5);
+    jest.unmock("./src/battleship");
+    const { Ship: RealShip } = require("./src/battleship");
+    ship = new RealShip("testShip", 5);
   });
 
   test("Ship properties", () => {
@@ -48,19 +42,51 @@ describe("Ship class real implementation", () => {
   });
 });
 
-const carrier = new Ship("Carrier", 5);
-const battleship = new Ship("Battleship", 4);
-const cruiser = new Ship("Cruiser", 3);
-const submarine = new Ship("Submarine", 3);
-const destroyer = new Ship("Destroyer", 2);
+// const carrier = new Ship("Carrier", 5);
+// const battleship = new Ship("Battleship", 4);
+// const cruiser = new Ship("Cruiser", 3);
+// const submarine = new Ship("Submarine", 3);
+// const destroyer = new Ship("Destroyer", 2);
 
 describe("Gameboard with mocked Ship", () => {
   let gameboard;
 
+  beforeAll(() => {
+    jest.mock("./src/battleship", () => {
+      const originalModule = jest.requireActual("./src/battleship");
+      return {
+        ...originalModule,
+        Ship: jest.fn().mockImplementation((name, length) => {
+          return {
+            name: name,
+            length: length,
+            timesHit: 0,
+            sunk: false,
+            coordinates: [],
+            hit: jest.fn().mockImplementation(function () {
+              return ++this.timesHit;
+            }),
+            isSunk: jest.fn().mockImplementation(function () {
+              if (this.timesHit === this.length) {
+                this.sunk = true;
+              }
+              return this.sunk;
+            }),
+          };
+        }),
+      };
+    });
+  });
+
   beforeEach(() => {
-    const { Gameboard: MockedGameboard } = require("../src/battleship");
+    const { Gameboard: MockedGameboard } = require("./src/battleship");
     gameboard = new MockedGameboard();
   });
+
+  afterAll(() => {
+    jest.unmock("./src/battleship");
+  });
+
   test("Gameboard properties", () => {
     expect(gameboard.size).toBe(10);
     expect(gameboard.grid).toEqual(gameboard.createGrid());

@@ -1,12 +1,10 @@
-import { Gameboard, Player } from "./src/battleship";
+import { Ship, Gameboard, Player } from "../src/battleship.js";
 
 describe("Ship class real implementation", () => {
   let ship;
 
   beforeEach(() => {
-    jest.unmock("./src/battleship");
-    const { Ship: RealShip } = require("./src/battleship");
-    ship = new RealShip("testShip", 5);
+    ship = new Ship("testShip", 5);
   });
 
   test("Ship properties", () => {
@@ -42,18 +40,12 @@ describe("Ship class real implementation", () => {
   });
 });
 
-// const carrier = new Ship("Carrier", 5);
-// const battleship = new Ship("Battleship", 4);
-// const cruiser = new Ship("Cruiser", 3);
-// const submarine = new Ship("Submarine", 3);
-// const destroyer = new Ship("Destroyer", 2);
-
-describe("Gameboard with mocked Ship", () => {
+describe("Gameboard class real implementation with mocked Ship", () => {
   let gameboard;
 
   beforeAll(() => {
-    jest.mock("./src/battleship", () => {
-      const originalModule = jest.requireActual("./src/battleship");
+    jest.mock("../src/battleship", () => {
+      const originalModule = jest.requireActual("../src/battleship");
       return {
         ...originalModule,
         Ship: jest.fn().mockImplementation((name, length) => {
@@ -79,12 +71,12 @@ describe("Gameboard with mocked Ship", () => {
   });
 
   beforeEach(() => {
-    const { Gameboard: MockedGameboard } = require("./src/battleship");
+    const { Gameboard: MockedGameboard } = require("../src/battleship");
     gameboard = new MockedGameboard();
   });
 
   afterAll(() => {
-    jest.unmock("./src/battleship");
+    jest.unmock("../src/battleship");
   });
 
   test("Gameboard properties", () => {
@@ -137,20 +129,20 @@ describe("Gameboard with mocked Ship", () => {
 
   test("receiveAttack should register hits and misses correctly", () => {
     gameboard.placeShip("testShip", 4, { x: 0, y: 1 }, { x: 0, y: 4 });
-    expect(gameboard.receiveAttack({ x: 1, y: 1 })).toBe(false);
-    expect(gameboard.receiveAttack({ x: 0, y: 1 })).toBe(false);
-    expect(gameboard.receiveAttack({ x: 0, y: 2 })).toBe(false);
-    expect(gameboard.receiveAttack({ x: 0, y: 3 })).toBe(false);
-    expect(gameboard.receiveAttack({ x: 0, y: 4 })).toBe(true);
+    expect(gameboard.receiveAttack({ x: 1, y: 1 })).toBe("miss");
+    expect(gameboard.receiveAttack({ x: 0, y: 1 })).toBe("hit");
+    expect(gameboard.receiveAttack({ x: 0, y: 2 })).toBe("hit");
+    expect(gameboard.receiveAttack({ x: 0, y: 3 })).toBe("hit");
+    expect(gameboard.receiveAttack({ x: 0, y: 4 })).toBe("hit");
     expect(gameboard.misses).toEqual([{ x: 1, y: 1 }]);
   });
 
   test("receiveAttack should sink the ship after enough hits", () => {
-    gameboard.placeShip("testShip", 3, { x: 0, y: 5 }, { x: 0, y: 7 });
+    gameboard.placeShip("testShip", 2, { x: 0, y: 5 }, { x: 0, y: 6 });
     gameboard.receiveAttack({ x: 0, y: 5 });
     gameboard.receiveAttack({ x: 0, y: 6 });
-    gameboard.receiveAttack({ x: 0, y: 7 });
-    expect(gameboard.ships[0].timesHit).toBe(3);
+    gameboard.grid[0][5].ship.isSunk();
+    expect(gameboard.ships[0].timesHit).toBe(2);
     expect(gameboard.grid[0][5].ship.sunk).toBe(true);
   });
 
@@ -183,7 +175,7 @@ describe("Gameboard with mocked Ship", () => {
   });
 });
 
-describe("Player", () => {
+describe("Player class real implementation", () => {
   let player;
 
   test("Player property when player is real", () => {

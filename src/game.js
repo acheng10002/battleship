@@ -35,6 +35,7 @@ function processAttack(x, y, gameboard) {
     if (gameboard.areAllShipsSunk()) {
         // if they are, appropriate alert message
         finalUpdateDOM(containerId);
+        removeGridEventListener('grid2');
         return;
     } else {
       switchPlayer();  

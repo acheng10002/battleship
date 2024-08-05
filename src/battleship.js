@@ -202,4 +202,4 @@ class Player {
   }
 }
 
-export { Player };
+export { Ship, Gameboard, Player };

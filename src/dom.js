@@ -35,24 +35,6 @@ function createGrid(containerId, gameboard, isUserGrid = true) {
       container.appendChild(cellDiv);
     });
   });
-  /*
-  // only adds the event listener to the computer player's gameboard
-  if (!isUserGrid) {
-    // adds a click event listener to the container
-    container.addEventListener('click', (event) => {
-      const cellDiv = event.target;
-      // when click happens, event handler checks if the target of the click has the grid-cell class
-      if (cellDiv.classList.contains('grid-cell')) {
-        /* if click target has grid-cell class, extracts the coordinates from data-coords attribute
-        split splits the string into an array of substrings
-        map applies the Number function to each element of the array 
-        const [x, y] = cellDiv.dataset.coords.split(',').map(Number);
-        // processes the real player's attack on the computer's gameboard 
-        processAttack(x, y, gameboard);
-      }
-    });
-  }
-  */
 }
 
 function addGridEventListener(containerId, gameboard) {

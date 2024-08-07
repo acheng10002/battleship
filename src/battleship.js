@@ -66,7 +66,7 @@ class Gameboard {
     // checks if the start and end pair of coordinates are valid
     if (!this.areValidCoordinates(start) || !this.areValidCoordinates(end)) {
       // if not, throws an error with a message
-      throw new Error("Invalid coordinates");
+      throw Error("Invalid coordinates");
     }
 
     // determines the ship's horizontal length; if > 1, the ship is placed horizontally

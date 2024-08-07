@@ -1,4 +1,4 @@
-import { createGrid, addGridEventListener } from './dom.js';
+import { createGrid, addGridEventListener, setupButtonListener } from './dom.js';
 import { gameboardOne, gameboardTwo } from './game.js';
 import './styles.css';
 
@@ -9,5 +9,6 @@ document.addEventListener('DOMContentLoaded', () => {
   createGrid('grid2', gameboardTwo, false);
   // if grid1 is the user's grid, grid2 is the computer's and requires event listeners
   addGridEventListener('grid2', gameboardTwo);
+  setupButtonListener();
 });
 

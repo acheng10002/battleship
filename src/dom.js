@@ -1,9 +1,11 @@
-import { processAttack } from "./game.js";
+import { processAttack, randomizeShipPlacement, gameboardOne, gameboardTwo } from "./game.js";
 /* *** in programming, x is the row index, and y is the column index 
 containerId is the id of the HTML element where the grid will be created
 gameboard is the object containing grid and its properties */
 function createGrid(containerId, gameboard, isUserGrid = true) {
   const container = document.getElementById(containerId);
+
+  container.innerHTML = '';
   // adds grid-container class to grid HTML element for styling 
   container.classList.add("grid-container");
 
@@ -39,14 +41,18 @@ function createGrid(containerId, gameboard, isUserGrid = true) {
 
 function addGridEventListener(containerId, gameboard) {
   const container = document.getElementById(containerId);
+  // makes the cell the click target
   const clickHandler = (event) => {
     const cellDiv = event.target;
     if (cellDiv.classList.contains('grid-cell')) {
+      /* gets dataset.coords attribute of cellDiv, divides the array into an array of substrings
+      and converts the type of the substrings to numbers, assigns those numbers to [x, y] */
       const [x, y] = cellDiv.dataset.coords.split(',').map(Number);
       processAttack(x, y, gameboard);
     }
   };
   container.addEventListener('click', clickHandler);
+  // assigns clickHandler property to container, and sets the property value to the reference of clickHandler function
   container.clickHandler = clickHandler;
 }
 
@@ -56,6 +62,18 @@ function removeGridEventListener(containerId) {
     container.removeEventListener('click', container.clickHandler);
     delete container.clickHandler;
   }
+}
+
+function setupButtonListener() {
+  const button = document.getElementById("button");
+  const turnResult = document.getElementById("turn-result");
+  
+  button.addEventListener('click', () => {
+    turnResult.textContent = "Let's go!";
+    randomizeShipPlacement(gameboardOne, gameboardTwo);
+    createGrid('grid1', gameboardOne, true);
+    createGrid('grid2', gameboardTwo, false);
+  });
 }
 
 /* main update to DOM
@@ -122,6 +140,6 @@ function finalUpdateDOM(containerId) {
 
 }
 
-export { createGrid, updateDOM, finalUpdateDOM, addGridEventListener, removeGridEventListener };
+export { createGrid, addGridEventListener, removeGridEventListener, setupButtonListener, updateDOM, finalUpdateDOM };
 
 

@@ -1,19 +1,13 @@
-import { createGrid, addGridEventListener, removeGridEventListener, setupButtonListener, updateDOM, finalUpdateDOM } from "../src/dom.js";
-import { processAttack, randomizeShipPlacement } from "../src/game.js";
+import { createGrid, addGridEventListener, removeGridEventListener, updateDOM, finalUpdateDOM } from "../src/dom.js";
+import { processAttack } from "../src/game.js";
+import * as domModule from "../src/dom.js";
+import * as gameModule from "../src/game.js";
 import "@testing-library/jest-dom";
 import { fireEvent } from "@testing-library/dom";
 
 jest.mock('../src/game.js', () => ({
     ...jest.requireActual('../src/game.js'),
     processAttack: jest.fn(),
-}));
-
-jest.mock('../src/game.js', () => ({
-    randomizeShipPlacement: jest.fn(),
-}));
-
-jest.mock('../src/game.js', () => ({
-    createGrid: jest.fn(),
 }));
 
 describe("createGrid and event listener dom functions", () => {
@@ -83,7 +77,37 @@ describe("createGrid and event listener dom functions", () => {
     });
 });
 
-describe('setupButtonListener')
+describe('setupButtonListener', () => {
+    let button, turnResult;
+
+    beforeEach(() => {
+        document.body.innerHTML = `
+        <div>
+            <h2 id="turn-result"></h2>
+            <div id="grid1"></div>
+            <div id="grid2"></div>
+            <button id="button">Randomize & Restart</button>
+        </div>
+        `;
+
+        button = document.getElementById("button");
+        turnResult = document.getElementById("turn-result");
+    });
+
+    test('sets up the button click listener', () => {
+
+        const createGridSpy = jest.spyOn(domModule, 'createGrid').mockImplementation(jest.fn());
+        const randomizeShipPlacementSpy = jest.spyOn(gameModule, 'randomizeShipPlacement').mockImplementation(jest.fn());
+
+        domModule.setupButtonListener();
+
+        button.click();
+
+        expect(turnResult.textContent).toBe("Let's go!");
+        createGridSpy.mockRestore();
+        randomizeShipPlacementSpy.mockRestore();
+    });
+});
 
 describe('updateDOM and finalUpdateDOM functions', () => {
     beforeEach(() => {
